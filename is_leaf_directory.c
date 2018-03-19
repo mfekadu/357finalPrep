@@ -19,12 +19,12 @@ int is_leaf_directory(const char *path) {
     return 0;
   }
 
-  /*if path exists*/
-  if(lstat(path, &sb) != -1) {
-    /*not a symlink*/
-    if(!S_ISLNK(sb.st_mode)) {
-      /*is a directory*/
-      if((dirp = opendir(path)) != NULL) {
+  if( (lstat(path, &sb) != -1) && /*if path exists*/
+      /* and not a symlink*/
+      (!S_ISLNK(sb.st_mode)) &&             
+      /* and is a directory*/
+      ((dirp = opendir(path)) != NULL)
+   ) {
         /*read entries until end of directory*/
         while((entry = readdir(dirp)) != NULL) {
           if(entry->d_type == DT_DIR) {
@@ -34,8 +34,6 @@ int is_leaf_directory(const char *path) {
         }
         return 1;
       }
-    }
-  }
   perror(path);
   return 0;
 }
