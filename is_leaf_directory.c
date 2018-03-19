@@ -9,17 +9,17 @@
 #include <dirent.h>
 #include <string.h>
 
-#define LSTAT_ERROR "why the fudge do you want to check if the" \
-                     " PREVIOUS DIRECTORY is a LEAF?!?" \
-                     " lstat only works with the current working dir."
-
 int is_leaf_directory(const char *path) {
-
-
       DIR *d;
       struct dirent *entry;
       struct stat sb;
       char cwd[PATH_MAX];
+
+      if (!strcmp(path, "..")) {
+         printf("Why would the PREVIOUS DIRECTORY be a LEAF?\n");
+         printf("I mean... think about it\n");
+         return 0;
+      }
       
       /*if path too long*/
       if(strlen(path) > PATH_MAX) {
@@ -38,16 +38,16 @@ int is_leaf_directory(const char *path) {
        * aka the now current working directory 
        */
       if( ((d = opendir(".")) != NULL) ) {
-
+         
          /* read entries until end of directory */
          while ((entry = readdir(d)) != NULL) {
 
                /* debug prints */
-               /**/ if ( getcwd(cwd, sizeof(cwd)) == NULL ) {
+               /* if ( getcwd(cwd, sizeof(cwd)) == NULL ) {
                   perror("getcwd");
                }
                printf("curr dir = %s\n", cwd);
-               /**/
+               */
                /* printf("%s\n", entry->d_name); */
 
                /* make sure entry is not the dot directories */
@@ -60,13 +60,8 @@ int is_leaf_directory(const char *path) {
 
                /* catch lstat error on a d_name???? */
                if ( lstat( entry->d_name , &sb) == -1 ) {
-                  if (!strcmp(path, "..")) {
-                     perror(LSTAT_ERROR);
-                  }
-                  else {
-                     /* some other lstat error */
-                     perror(path);
-                  }
+                  /* some lstat error */
+                  perror(path);
                   exit(1);
                }
 
