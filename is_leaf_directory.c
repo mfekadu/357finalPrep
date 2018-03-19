@@ -27,18 +27,27 @@ int is_leaf_directory(const char *path) {
          return 0;
       }
 
-      /* if we can safely open the path */
-      if( ((d = opendir(path)) != NULL) ) {
+      /* have to chdir to make lstat work for any path */
+      if (chdir(path) == -1) {
+         printf("chdir fail\n");
+         perror(path);
+         exit(1);
+      }
+
+      /* if we can safely open the path
+       * aka the now current working directory 
+       */
+      if( ((d = opendir(".")) != NULL) ) {
 
          /* read entries until end of directory */
          while ((entry = readdir(d)) != NULL) {
 
                /* debug prints */
-               /* if ( getcwd(cwd, sizeof(cwd)) == NULL ) {
+               /**/ if ( getcwd(cwd, sizeof(cwd)) == NULL ) {
                   perror("getcwd");
                }
                printf("curr dir = %s\n", cwd);
-               */
+               /**/
                /* printf("%s\n", entry->d_name); */
 
                /* make sure entry is not the dot directories */
